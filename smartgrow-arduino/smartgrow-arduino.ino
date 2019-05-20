@@ -6,6 +6,7 @@
 // - Adafruit Unified Sensor Lib: https://github.com/adafruit/Adafruit_Sensor
 
 #include "DHT.h"
+#include <SoftwareSerial.h>
 
 #define DHTPIN 2     // Digital pin connected to the DHT sensor
 // Feather HUZZAH ESP8266 note: use pins 3, 4, 5, 12, 13 or 14 --
@@ -29,12 +30,14 @@
 // as the current DHT reading algorithm adjusts itself to work on faster procs.
 DHT dht(DHTPIN, DHTTYPE);
 
+// Initialize serial communication
+SoftwareSerial wifiSerial(10, 11); // RX, TX
+
 void setup() {
   Serial.begin(9600);
   Serial.println(F("DHT11 test!"));
-  
- 
   dht.begin();
+  wifiSerial.begin(4800);
 }
 
 void loop() {
@@ -71,4 +74,9 @@ void loop() {
   Serial.print(F("°C "));
   Serial.print(hif);
   Serial.println(F("°F"));
+
+  Serial.println (String(t));
+  
+  Serial.println("Sending temperature to wifi module...");
+  wifiSerial.println(hic);
 }

@@ -1,6 +1,6 @@
 #include <SoftwareSerial.h>
 
-SoftwareSerial mySerial(12, 14); // RX, TX
+SoftwareSerial wifiSerial(12, 14); // RX, TX
 
 void setup() {
   // Open serial communications and wait for port to open:
@@ -13,12 +13,12 @@ void setup() {
   Serial.println("ESP Started!");
 
   // set the data rate for the SoftwareSerial port
-  mySerial.begin(4800);
+  wifiSerial.begin(4800);
   //mySerial.println("I am esp");
 }
 
 void loop() { // run over and over
-  if (mySerial.available()) {
-    Serial.write(mySerial.read());
+  if (wifiSerial.available()) {
+    Serial.write(wifiSerial.read());
   }
 }
