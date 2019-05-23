@@ -28,8 +28,6 @@ void setup() {
       // set the data rate for the SoftwareSerial port
   wifiSerial.begin(4800);
 
-  //mySerial.println("I am esp");
-
   WiFi.mode(WIFI_OFF); //Prevents reconnection issue (taking too long to connect)
   delay(1000);
   WiFi.mode(WIFI_STA); 
@@ -47,10 +45,12 @@ void setup() {
   Serial.println(WiFi.localIP());// Print the IP address
 }
 
-void sendRequest (String newReading) {
+void sendRequest (String newReading, String path) {
   Serial.println ("Sending new request");
             
-        httpsClient.println("POST /temperature HTTP/1.1");
+        httpsClient.print("POST ");
+        httpsClient.print(path);
+        httpsClient.println(" HTTP/1.1");
         httpsClient.println ("Host: api.smartgrow.space");
         httpsClient.println ("Connection: keep-alive");
         httpsClient.println ("User-Agent: Arduino");
@@ -64,18 +64,43 @@ void sendRequest (String newReading) {
         Serial.println("request sent");
 }
 
+void splitTempHumString (String newReading) {
+  int ind1 = newReading.indexOf(';');  //finds location of first ,
+  
+  //temperature
+  String tempString = newReading.substring(0, ind1);   //captures first data String
+  
+  int readingTempIndex = tempString.indexOf(':');
+  String temp = tempString.substring(readingTempIndex+1, tempString.length());
+  
+  Serial.println (temp);
+  sendRequest (temp, String("/temperature"));
+  //
+
+  //humidity
+  String humString = newReading.substring(ind1+1, newReading.length());
+  
+  int readingHumIndex = humString.indexOf(':');
+  String hum = humString.substring(readingHumIndex+1, humString.length());
+  Serial.println(hum);
+  
+  sendRequest (hum, String("/humidity"));
+  //
+}
+
 void loop() { // run over and over
   String newReading;
   
   if (wifiSerial.available()) {
     newReading = wifiSerial.readString();
     Serial.println("New reading: " + newReading);
+    splitTempHumString (newReading);
 
     if (httpsClient.connected()){
       Serial.println ("Using old connection");
 
       if (WiFi.status() == WL_CONNECTED) { //Check WiFi connection status
-        sendRequest (newReading);
+        //sendRequest (newReading);
       } else {
         Serial.println ("Wifi NOT connected");
       }  
@@ -92,7 +117,7 @@ void loop() { // run over and over
         r++;
       }
 
-      sendRequest (newReading);
+      //sendRequest (newReading);
     } 
   } else {
     delay(5000);

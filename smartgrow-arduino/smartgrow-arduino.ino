@@ -76,5 +76,5 @@ void loop() {
   Serial.println(F("°F"));
 
   Serial.println("Sending temperature to wifi module...");
-  wifiSerial.print(hic);
+  wifiSerial.print("temp:" + String(hic) + ";hum:" + String(h));
 }
