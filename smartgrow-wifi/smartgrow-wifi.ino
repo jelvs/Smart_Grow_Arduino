@@ -13,6 +13,7 @@ const char fingerprint[] PROGMEM = "AB D6 83 53 83 E3 5A EF 40 16 2C 26 70 56 30
 const char *host = "api.smartgrow.space";
 const int httpsPort = 443;  //HTTPS= 443 and HTTP = 80
 
+WiFiClientSecure httpsClient;    //Declare object of class WiFiClient
 
 SoftwareSerial wifiSerial(12, 14); // RX, TX
 
@@ -46,6 +47,23 @@ void setup() {
   Serial.println(WiFi.localIP());// Print the IP address
 }
 
+void sendRequest (String newReading) {
+  Serial.println ("Sending new request");
+            
+        httpsClient.println("POST /temperature HTTP/1.1");
+        httpsClient.println ("Host: api.smartgrow.space");
+        httpsClient.println ("Connection: keep-alive");
+        httpsClient.println ("User-Agent: Arduino");
+        httpsClient.println ("Content-Type: application/json");
+        httpsClient.println ("content-length: 21");
+        httpsClient.println ("");    
+        httpsClient.print ("{\n\t\"reading\": ");
+        httpsClient.print (newReading);
+        httpsClient.print ("\n}");
+
+        Serial.println("request sent");
+}
+
 void loop() { // run over and over
   String newReading;
   
@@ -53,61 +71,30 @@ void loop() { // run over and over
     newReading = wifiSerial.readString();
     Serial.println("New reading: " + newReading);
 
-  WiFiClientSecure httpsClient;    //Declare object of class WiFiClient
+    if (httpsClient.connected()){
+      Serial.println ("Using old connection");
 
-  Serial.println(host); 
-  httpsClient.setFingerprint(fingerprint);
-  httpsClient.setTimeout(15000);
-  delay(1000);
-
-  int r=0; //retry counter
-  while((!httpsClient.connect(host, httpsPort)) && (r < 30)){
-    delay(100);
-    Serial.print(".");
-    r++;
-  }
- 
-  if (WiFi.status() == WL_CONNECTED) { //Check WiFi connection status
-    Serial.println ("Sending new request");
-    String getData, Link;
-    Link = "/temperature";
+      if (WiFi.status() == WL_CONNECTED) { //Check WiFi connection status
+        sendRequest (newReading);
+      } else {
+        Serial.println ("Wifi NOT connected");
+      }  
+    } else {
+      Serial.println("Https new Connection");
+      httpsClient.setFingerprint(fingerprint);
+      httpsClient.setTimeout(15000);
+      delay(1000);
     
-    httpsClient.println("POST /temperature HTTP/1.1");
-    httpsClient.println ("Host: api.smartgrow.space");
-    httpsClient.println ("Connection: close");
-    httpsClient.println ("User-Agent: Arduino");
-    httpsClient.println ("Content-Type: application/json");
-    httpsClient.println ("content-length: 21");
-    httpsClient.println ("");    
-    httpsClient.print ("{\n\t\"reading\": ");
-    httpsClient.print (newReading);
-    httpsClient.print ("\n}");
-
-
-    Serial.println("request sent");
-
-    while (httpsClient.connected()) {
-      String line = httpsClient.readStringUntil('\n');
-      if (line == "\r") {
-        Serial.println("headers received");
-        break;
+      int r=0; //retry counter
+      while((!httpsClient.connect(host, httpsPort)) && (r < 30)){
+        delay(100);
+        Serial.print(".");
+        r++;
       }
-    }
 
-    Serial.println("reply was:");
-    Serial.println("==========");
-    String line;
-    while(httpsClient.available()){        
-      line = httpsClient.readStringUntil('\n');  //Read Line by Line
-      Serial.println(line); //Print response
-    }
-    Serial.println("==========");
-    Serial.println("closing connection");
+      sendRequest (newReading);
+    } 
   } else {
-    Serial.println ("Wifi NOT connected");
-  }
-  } else {
-    Serial.println("Error");
-    delay(1000);
+    delay(5000);
   }
 }
