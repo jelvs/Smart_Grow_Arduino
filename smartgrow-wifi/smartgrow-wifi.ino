@@ -76,15 +76,40 @@ void splitTempHumString (String newReading) {
   Serial.println (temp);
   sendRequest (temp, String("/temperature"));
   //
-
+  
+  int ind2 = readString.indexOf(';', ind1+1 );
+  
   //humidity
-  String humString = newReading.substring(ind1+1, newReading.length());
+  String humString = newReading.substring(ind1+1, ind2+1);
   
   int readingHumIndex = humString.indexOf(':');
   String hum = humString.substring(readingHumIndex+1, humString.length());
   Serial.println(hum);
   
   sendRequest (hum, String("/humidity"));
+  //
+  
+  int ind3 = readString.indexOf(';', ind2+1 );
+  
+  //soil
+  String soilString = newReading.substring(ind2+1, ind3+1);
+  
+  int readingSoilIndex = soilString.indexOf(':');
+  String soil = humString.substring(readingHumIndex+1, humString.length());
+  Serial.println("soil: " + soil);
+
+  sendRequest (soil, String("/soil"));
+  //
+  
+  //ind4 = readString.indexOf(';', ind3+1 );
+  
+  //light
+  String lightString = newReading.substring(ind3+1, newReading.length());
+  
+  int readingLightIndex = lightString.indexOf(':');
+  String light = humString.substring(readingHumIndex+1, humString.length());
+  Serial.println("light: " + light);
+  sendRequest (light, String("/light"));
   //
 }
 
