@@ -1,3 +1,10 @@
+
+
+
+
+
+
+
 // Example testing sketch for various DHT humidity/temperature sensors
 // Written by ladyada, public domain
 
@@ -5,8 +12,10 @@
 // - DHT Sensor Library: https://github.com/adafruit/DHT-sensor-library
 // - Adafruit Unified Sensor Lib: https://github.com/adafruit/Adafruit_Sensor
 
+#include <Adafruit_Sensor.h>
 #include "DHT.h"
 #include <SoftwareSerial.h>
+
 
 #define DHTPIN 2     // Digital pin connected to the DHT sensor
 // Feather HUZZAH ESP8266 note: use pins 3, 4, 5, 12, 13 or 14 --
@@ -24,18 +33,33 @@
 // Connect pin 4 (on the right) of the sensor to GROUND
 // Connect a 10K resistor from pin 2 (data) to pin 1 (power) of the sensor
 
+// Analog for Soil Moisture Sensor
+#define SoilMoisturePin A0 
+//Analog for Light Sensor
+#define LightPin A1  
+
 // Initialize DHT sensor.
-// Note that older versions of this library took an optional third parameter to
-// tweak the timings for faster processors.  This parameter is no longer needed
-// as the current DHT reading algorithm adjusts itself to work on faster procs.
+
 DHT dht(DHTPIN, DHTTYPE);
 
 // Initialize serial communication
 SoftwareSerial wifiSerial(10, 11); // RX, TX
 
+//Soil Sensor Value
+float soilSensorValue = 0;
+//Light Sensor Value
+int lightValue = 0;
+
+int greenLedPin = 3;
+int yellowLedPin = 4;
+int redLedPin = 5;
+
 void setup() {
   Serial.begin(9600);
   Serial.println(F("DHT11 test!"));
+  //pinMode(greenLedPin, OUTPUT);
+  //pinMode(yellowLedPin,OUTPUT);
+  //pinMode(redLedPin,OUTPUT);
   dht.begin();
   wifiSerial.begin(4800);
 }
@@ -52,6 +76,9 @@ void loop() {
   // Read temperature as Fahrenheit (isFahrenheit = true)
   float f = dht.readTemperature(true);
 
+  soilSensorValue = soilSensorValue + analogRead(SoilMoisturePin);
+  lightValue = analogRead(LightPin);
+
   // Check if any reads failed and exit early (to try again).
   if (isnan(h) || isnan(t) || isnan(f)) {
     Serial.println(F("Failed to read from DHT sensor!"));
@@ -63,6 +90,10 @@ void loop() {
   // Compute heat index in Celsius (isFahreheit = false)
   float hic = dht.computeHeatIndex(t, h, false);
 
+  soilSensorValue = soilSensorValue/100.0; 
+  Serial.println("Soil Reading: " + String(soilSensorValue)); 
+  Serial.println("Light Reading: " + String(lightValue)); 
+  
   Serial.print(F("Humidity: "));
   Serial.print(h);
   Serial.print(F("%  Temperature: "));
@@ -75,6 +106,7 @@ void loop() {
   Serial.print(hif);
   Serial.println(F("°F"));
 
+  
   Serial.println("Sending temperature to wifi module...");
   wifiSerial.print("temp:" + String(hic) + ";hum:" + String(h));
 }
