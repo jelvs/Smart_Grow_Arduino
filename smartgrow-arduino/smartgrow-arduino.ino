@@ -36,7 +36,7 @@
 // Analog for Soil Moisture Sensor
 #define SoilMoisturePin A0 
 //Analog for Light Sensor
-#define LightPin A1  
+#define LightPin A2  
 
 // Initialize DHT sensor.
 
@@ -48,7 +48,7 @@ SoftwareSerial wifiSerial(10, 11); // RX, TX
 //Soil Sensor Value
 float soilSensorValue = 0;
 //Light Sensor Value
-int lightValue = 0;
+float lightValue = 0;
 
 int greenLedPin = 3;
 int yellowLedPin = 4;
@@ -108,5 +108,6 @@ void loop() {
 
   
   Serial.println("Sending temperature to wifi module...");
-  wifiSerial.print("temp:" + String(hic) + ";hum:" + String(h) + ";soil:" + String(soilSensorValue) + ";light:" + String(lightValue);
+  wifiSerial.print("temp:" + String(hic) + ";hum:" + String(h) + ";soil:" + String(soilSensorValue) + ";light:" + String(lightValue));
+  delay(5000);
 }
