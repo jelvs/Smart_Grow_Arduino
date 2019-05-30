@@ -47,8 +47,8 @@ void setup() {
   Serial.print("The IP Address of ESP8266 Module is: ");
   Serial.println(WiFi.localIP());// Print the IP address
   //sendIp(String(WiFi.localIP()), "/arduinoIP");
-  server.on("/light", handleLight); //Associate the handler function to the path
-  server.on("/water", handleWater); //Associate the handler function to the path
+  //server.on("/light", handleLight); //Associate the handler function to the path
+  //server.on("/water", handleWater); //Associate the handler function to the path
   //server.begin(); //Start the server
   //Serial.println("Server listening");
 }
@@ -68,9 +68,11 @@ void sendRequest (String newReading, String path) {
         httpsClient.print ("{\n\t\"reading\": ");
         httpsClient.print (newReading);
         httpsClient.print ("\n}");
+       
 
-        Serial.println("request sent");
-        delay(100);
+        //Serial.println("request sent");
+        //delay(5000);
+        
         
 }
 
@@ -89,6 +91,8 @@ void sendRequest2 (String newReading, String path) {
         httpsClient.print ("{\n\t\"reading\": ");
         httpsClient.print (newReading);
         httpsClient.print ("\n}");
+       
+        
 
         Serial.println("request sent");
         delay(200);
@@ -110,6 +114,7 @@ void sendIp (String ip, String path) {
         httpsClient.print ("{\n\t\"reading\": ");
         httpsClient.print (ip);
         httpsClient.print ("\n}");
+        
 
         Serial.println("request sent");
         delay(200);
@@ -138,7 +143,7 @@ void splitTempHumString (String newReading) {
   String hum = humString.substring(readingHumIndex+1, humString.length());
   //Serial.println(hum);
   
-  sendRequest (hum, String("/humidity"));
+  sendRequest(hum, String("/humidity"));
   //
   
   int ind3 = newReading.indexOf(';', ind2+1 );
@@ -151,18 +156,18 @@ void splitTempHumString (String newReading) {
   String soil = soilString.substring(readingSoilIndex+1, soilString.length());
   //Serial.println("soil: " + soil);
 
-  sendRequest (soil, String("/soil"));
+  sendRequest(soil, String("/soil"));
   //
   
-  //ind4 = readString.indexOf(';', ind3+1 );
+  int ind4 = newReading.indexOf(';', ind3+1);
   
   //light
-  String lightString = newReading.substring(ind3+1, newReading.length());
-  
+  String lightString = newReading.substring(ind3+1, ind4);
+ 
   int readingLightIndex = lightString.indexOf(':');
-  String light = lightString.substring(readingLightIndex+1, lightString.length());
-  //Serial.println("light: " + light);
-  sendRequest2 (light, String("/light"));
+  String light = lightString.substring(readingLightIndex+1, lightString.length()-1);
+  Serial.println("light: " + light);
+  sendRequest(light, String("/light"));
   //
 }
 
