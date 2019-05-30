@@ -135,7 +135,8 @@ void handleLight() { //Handler for the body path
  
       }
  
-      String message = server.arg("plain");
+      String message = "Light:";
+             message += server.arg("plain");
              
  
       server.send(200, "text/plain", message);
@@ -152,12 +153,12 @@ void handleWater() { //Handler for the body path
  
       }
  
-      String message = "Body received:\n";
+      String message = "Water:";
              message += server.arg("plain");
-             message += "\n";
  
       server.send(200, "text/plain", message);
-      Serial.println(message);
+      wifiSerial.print(message);
+ 
 }
 
 void loop() { // run over and over

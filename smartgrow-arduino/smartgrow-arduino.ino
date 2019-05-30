@@ -59,20 +59,29 @@ void setup() {
   Serial.println(F("DHT11 test!"));
   pinMode(greenLedPin, OUTPUT);
   //pinMode(yellowLedPin,OUTPUT);
-  //pinMode(redLedPin,OUTPUT);
+  pinMode(redLedPin,OUTPUT);
   dht.begin();
   wifiSerial.begin(4800);
   
 }
 
 void turnOnOFFLight(String message){
-  Serial.println(message);
   if(message.equals("ON")){
     Serial.println("Turning on Light");
     digitalWrite(greenLedPin, HIGH);
   }else{
     Serial.println("Turning off Light");
     digitalWrite(greenLedPin, LOW);
+  }
+}
+
+void turnOnOFFWater(String message){
+  if(message.equals("ON")){
+    Serial.println("Turning on Light");
+    digitalWrite(redLedPin, HIGH);
+  }else{
+    Serial.println("Turning off Light");
+    digitalWrite(redLedPin, LOW);
   }
 }
 
@@ -124,7 +133,16 @@ void loop() {
   delay(500);
 
   if (wifiSerial.available()) {
-    String hello = wifiSerial.readString();
-    turnOnOFFLight(hello);
+    String light_water_switch = wifiSerial.readString();
+    int ind1 = light_water_switch.indexOf(':');
+    String switchString = light_water_switch.substring(0, ind1); 
+    if(switchString.equals("Light")){
+        String onOff = light_water_switch.substring(ind1+1, light_water_switch.length()); 
+        turnOnOFFLight(onOff);
+    }else{
+        String onOff = light_water_switch.substring(ind1+1, light_water_switch.length()); 
+        turnOnOFFWater(onOff);
+    }
+    
   }
 }
