@@ -122,7 +122,6 @@ void splitTempHumString (String newReading) {
  
   int readingLightIndex = lightString.indexOf(':');
   String light = lightString.substring(readingLightIndex+1, lightString.length()-1);
-  Serial.println("light: " + light);
   sendRequest(light, String("/light"));
   //
 }
@@ -136,13 +135,12 @@ void handleLight() { //Handler for the body path
  
       }
  
-      String message = "Body received:\n";
-             message += server.arg("plain");
-             message += "\n";
+      String message = server.arg("plain");
+             
  
       server.send(200, "text/plain", message);
-      Serial.println(message);
-      wifiSerial.print("on");
+      //Serial.println(message);
+      wifiSerial.print(message);
 }
 
 void handleWater() { //Handler for the body path
@@ -165,7 +163,6 @@ void handleWater() { //Handler for the body path
 void loop() { // run over and over
   String newReading;
   server.handleClient();
-  Serial.println("OLA");
   
   if (wifiSerial.available()) {
     newReading = wifiSerial.readString();

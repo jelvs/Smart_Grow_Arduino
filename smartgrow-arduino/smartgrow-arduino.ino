@@ -50,18 +50,30 @@ float soilSensorValue = 0;
 //Light Sensor Value
 float lightValue = 0;
 
-int greenLedPin = 4;
+int greenLedPin = 3;
 int yellowLedPin = 5;
 int redLedPin = 6;
 
 void setup() {
   Serial.begin(9600);
   Serial.println(F("DHT11 test!"));
-  //pinMode(greenLedPin, OUTPUT);
+  pinMode(greenLedPin, OUTPUT);
   //pinMode(yellowLedPin,OUTPUT);
   //pinMode(redLedPin,OUTPUT);
   dht.begin();
   wifiSerial.begin(4800);
+  
+}
+
+void turnOnOFFLight(String message){
+  Serial.println(message);
+  if(message.equals("ON")){
+    Serial.println("Turning on Light");
+    digitalWrite(greenLedPin, HIGH);
+  }else{
+    Serial.println("Turning off Light");
+    digitalWrite(greenLedPin, LOW);
+  }
 }
 
 void loop() {
@@ -91,8 +103,8 @@ void loop() {
   float hic = dht.computeHeatIndex(t, h, false);
 
   soilSensorValue = soilSensorValue/100.0; 
-  Serial.println("Soil Reading: " + String(soilSensorValue)); 
-  Serial.println("Light Reading: " + String(lightValue)); 
+  //Serial.println("Soil Reading: " + String(soilSensorValue)); 
+  //Serial.println("Light Reading: " + String(lightValue)); 
   
   Serial.print(F("Humidity: "));
   Serial.print(h);
@@ -113,6 +125,6 @@ void loop() {
 
   if (wifiSerial.available()) {
     String hello = wifiSerial.readString();
-    Serial.println(hello);
+    turnOnOFFLight(hello);
   }
 }
