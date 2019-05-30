@@ -92,6 +92,7 @@ void loop() {
 
   
   Serial.println("Sending temperature to wifi module...");
+  wifiSerial.print("temp:" + String(hic) + ";hum:" + String(h) + ";soil:" + String(soilSensorValue) + ";light:" + String(lightValue) + ";finish");
   delay(500);
 
   // Receiving requests from the wifi module to turn on/off light/water

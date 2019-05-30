@@ -6,8 +6,8 @@
 
 ESP8266WebServer server(80);
 
-const char* ssid = "Pixel_7800";
-const char* password = "fb0e2ec94666";
+const char* ssid = "EduroamNaoFunciona";
+const char* password = "netdemerda";
 
 const char fingerprint[] PROGMEM = "AB D6 83 53 83 E3 5A EF 40 16 2C 26 70 56 30 11 54 BA 28 DB";
 
@@ -66,8 +66,6 @@ void sendRequest (String newReading, String path) {
   httpsClient.print (newReading);
   httpsClient.print ("\n}");
 }
-
-
 
 void splitSensorReadings (String newReading) {
   int ind1 = newReading.indexOf(';');  //finds location of first ;
@@ -150,7 +148,7 @@ void handleWater() {
 void loop() {
   // Server http requests
   server.handleClient();
-
+  
   String newReading;
   
   if (wifiSerial.available()) {
@@ -173,10 +171,10 @@ void loop() {
         Serial.print(".");
         r++;
       }
-
-      // Actually splits the arduino uno sensor readings request and send data to server
-      splitSensorReadings (newReading);
     }
+
+    // Actually splits the arduino uno sensor readings request and send data to server
+    splitSensorReadings (newReading);
   } else {
     delay(5000);
   }
