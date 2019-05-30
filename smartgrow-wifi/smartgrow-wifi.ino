@@ -6,8 +6,8 @@
  
 ESP8266WebServer server(80);
 
-const char* ssid = "Tiago's IPhone";
-const char* password = "12345jelvspower12345";
+const char* ssid = "Pixel_7800";
+const char* password = "fb0e2ec94666";
 
 const char fingerprint[] PROGMEM = "AB D6 83 53 83 E3 5A EF 40 16 2C 26 70 56 30 11 54 BA 28 DB";
 
@@ -46,11 +46,10 @@ void setup() {
   Serial.println("WiFi connection Successful");
   Serial.print("The IP Address of ESP8266 Module is: ");
   Serial.println(WiFi.localIP());// Print the IP address
-  //sendIp(String(WiFi.localIP()), "/arduinoIP");
-  //server.on("/light", handleLight); //Associate the handler function to the path
-  //server.on("/water", handleWater); //Associate the handler function to the path
-  //server.begin(); //Start the server
-  //Serial.println("Server listening");
+  server.on("/light", handleLight); //Associate the handler function to the path
+  server.on("/water", handleWater); //Associate the handler function to the path
+  server.begin(); //Start the server
+  Serial.println("Server listening");
 }
 
 void sendRequest (String newReading, String path) {
@@ -76,50 +75,7 @@ void sendRequest (String newReading, String path) {
         
 }
 
-void sendRequest2 (String newReading, String path) {
-  Serial.println ("Sending new request");
-            
-        httpsClient.print("POST ");
-        httpsClient.print(path);
-        httpsClient.println(" HTTP/1.1");
-        httpsClient.println ("Host: api.smartgrow.space");
-        httpsClient.println ("Connection: keep-alive");
-        httpsClient.println ("User-Agent: Arduino");
-        httpsClient.println ("Content-Type: application/json");
-        httpsClient.println ("content-length: 21");
-        httpsClient.println ("");    
-        httpsClient.print ("{\n\t\"reading\": ");
-        httpsClient.print (newReading);
-        httpsClient.print ("\n}");
-       
-        
 
-        Serial.println("request sent");
-        delay(200);
-        
-}
-
-void sendIp (String ip, String path) {
-  Serial.println ("Sending new request");
-            
-        httpsClient.print("POST ");
-        httpsClient.print(path);
-        httpsClient.println(" HTTP/1.1");
-        httpsClient.println ("Host: api.smartgrow.space");
-        httpsClient.println ("Connection: keep-alive");
-        httpsClient.println ("User-Agent: Arduino");
-        httpsClient.println ("Content-Type: application/json");
-        httpsClient.println ("content-length: 21");
-        httpsClient.println ("");    
-        httpsClient.print ("{\n\t\"reading\": ");
-        httpsClient.print (ip);
-        httpsClient.print ("\n}");
-        
-
-        Serial.println("request sent");
-        delay(200);
-        
-}
 
 void splitTempHumString (String newReading) {
   int ind1 = newReading.indexOf(';');  //finds location of first ,
@@ -207,6 +163,8 @@ void handleWater() { //Handler for the body path
 
 void loop() { // run over and over
   String newReading;
+  server.handleClient();
+  Serial.println("OLA");
   
   if (wifiSerial.available()) {
     newReading = wifiSerial.readString();
