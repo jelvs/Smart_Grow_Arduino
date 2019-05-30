@@ -142,6 +142,7 @@ void handleLight() { //Handler for the body path
  
       server.send(200, "text/plain", message);
       Serial.println(message);
+      wifiSerial.print("on");
 }
 
 void handleWater() { //Handler for the body path
@@ -193,7 +194,7 @@ void loop() { // run over and over
       }
 
       //sendRequest (newReading);
-    } 
+    }
   } else {
     delay(5000);
   }
