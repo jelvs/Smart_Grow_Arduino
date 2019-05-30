@@ -50,9 +50,9 @@ float soilSensorValue = 0;
 //Light Sensor Value
 float lightValue = 0;
 
-int greenLedPin = 3;
-int yellowLedPin = 4;
-int redLedPin = 5;
+int greenLedPin = 4;
+int yellowLedPin = 5;
+int redLedPin = 6;
 
 void setup() {
   Serial.begin(9600);

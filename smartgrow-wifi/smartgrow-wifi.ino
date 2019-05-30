@@ -2,6 +2,9 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecure.h>
+#include <ESP8266WebServer.h>
+ 
+ESP8266WebServer server(80);
 
 const char* ssid = "Tiago's IPhone";
 const char* password = "12345jelvspower12345";
@@ -43,6 +46,11 @@ void setup() {
   Serial.println("WiFi connection Successful");
   Serial.print("The IP Address of ESP8266 Module is: ");
   Serial.println(WiFi.localIP());// Print the IP address
+  //sendIp(String(WiFi.localIP()), "/arduinoIP");
+  server.on("/light", handleLight); //Associate the handler function to the path
+  server.on("/water", handleWater); //Associate the handler function to the path
+  //server.begin(); //Start the server
+  //Serial.println("Server listening");
 }
 
 void sendRequest (String newReading, String path) {
@@ -80,6 +88,27 @@ void sendRequest2 (String newReading, String path) {
         httpsClient.println ("");    
         httpsClient.print ("{\n\t\"reading\": ");
         httpsClient.print (newReading);
+        httpsClient.print ("\n}");
+
+        Serial.println("request sent");
+        delay(200);
+        
+}
+
+void sendIp (String ip, String path) {
+  Serial.println ("Sending new request");
+            
+        httpsClient.print("POST ");
+        httpsClient.print(path);
+        httpsClient.println(" HTTP/1.1");
+        httpsClient.println ("Host: api.smartgrow.space");
+        httpsClient.println ("Connection: keep-alive");
+        httpsClient.println ("User-Agent: Arduino");
+        httpsClient.println ("Content-Type: application/json");
+        httpsClient.println ("content-length: 21");
+        httpsClient.println ("");    
+        httpsClient.print ("{\n\t\"reading\": ");
+        httpsClient.print (ip);
         httpsClient.print ("\n}");
 
         Serial.println("request sent");
@@ -135,6 +164,40 @@ void splitTempHumString (String newReading) {
   //Serial.println("light: " + light);
   sendRequest2 (light, String("/light"));
   //
+}
+
+void handleLight() { //Handler for the body path
+ 
+      if (server.hasArg("plain")== false){ //Check if body received
+ 
+            server.send(200, "text/plain", "Body not received");
+            return;
+ 
+      }
+ 
+      String message = "Body received:\n";
+             message += server.arg("plain");
+             message += "\n";
+ 
+      server.send(200, "text/plain", message);
+      Serial.println(message);
+}
+
+void handleWater() { //Handler for the body path
+ 
+      if (server.hasArg("plain")== false){ //Check if body received
+ 
+            server.send(200, "text/plain", "Body not received");
+            return;
+ 
+      }
+ 
+      String message = "Body received:\n";
+             message += server.arg("plain");
+             message += "\n";
+ 
+      server.send(200, "text/plain", message);
+      Serial.println(message);
 }
 
 void loop() { // run over and over
